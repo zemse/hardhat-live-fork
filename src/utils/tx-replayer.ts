@@ -74,7 +74,7 @@ export async function startTxReplayer(
 
     const txsToReplay = txsMatched.filter((_, i) => !!rcs[i].status);
 
-    logger(`Replaying ${txsToReplay.length} out of ${totalTxs} txs`);
+    logger(`Matched ${txsToReplay.length} out of ${totalTxs} txs`);
 
     for (const tx of txsToReplay) {
       // impersonate the address if not already
