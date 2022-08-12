@@ -1,58 +1,83 @@
-# Hardhat TypeScript plugin boilerplate
+# hardhat-live-fork
 
-This is a sample Hardhat plugin written in TypeScript. Creating a Hardhat plugin
-can be as easy as extracting a part of your config into a different file and
-publishing it to npm.
+_Runs mainnet fork along with replaying mainnet txs._
 
-This sample project contains an example on how to do that, but also comes with
-many more features:
-
-- A mocha test suite ready to use
-- TravisCI already setup
-- A package.json with scripts and publishing info
-- Examples on how to do different things
+When simulating a smart contract + UI on mainnet fork, everything else is paused, i.e. Chainlink oracles don't update. This plugin basically replays mainnet txs on the fork chain. Also to prevent replaying a lot of txs, a logic can be provided to filter only relevant txs for replaying.
 
 ## Installation
 
-To start working on your project, just run
+### Step 1: Install the plugin
+
+Install `hardhat-live-fork` as well as `ethers` if not already.
 
 ```bash
-npm install
+npm install hardhat-live-fork ethers
 ```
 
-## Plugin development
+### Step 2: Import the plugin in your `hardhat.config.js`:
 
-Make sure to read our [Plugin Development Guide](https://hardhat.org/advanced/building-plugins.html) to learn how to build a plugin.
+```js
+require("hardhat-live-fork");
+```
 
-## Testing
+or `hardhat.config.ts`:
 
-Running `npm run test` will run every test located in the `test/` folder. They
-use [mocha](https://mochajs.org) and [chai](https://www.chaijs.com/),
-but you can customize them.
+```ts
+import "hardhat-live-fork";
+```
 
-We recommend creating unit tests for your own modules, and integration tests for
-the interaction of the plugin with Hardhat and its dependencies.
+### Step 3: Configure mainnet fork
 
-## Linting and autoformat
+In hardhat.config.js:
 
-All of Hardhat projects use [prettier](https://prettier.io/) and
-[tslint](https://palantir.github.io/tslint/).
+```ts
+const config: HardhatUserConfig = {
+  solidity: "0.7.3",
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      forking: {
+        enabled: true,
+        // provide fork url here
+        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+      },
+    },
+  },
+  liveFork: {
+    txMatcher: (tx) => {
+      // custom logic to match which txs to replay on LiveFork
+      // e.g. only replay mainnet txs sent to this address
+      return tx.to === "0x1234";
+    },
+  },
+};
 
-You can check if your code style is correct by running `npm run lint`, and fix
-it with `npm run lint:fix`.
+export default config;
+```
 
-## Building the project
+### Step 4: Run the node
 
-Just run `npm run build` ️👷
+The following will start hardhat node along with replaying txs from mainnet (provided fork url).
 
-## README file
+```
+npx hardhat node
+```
 
-This README describes this boilerplate project, but won't be very useful to your
-plugin users.
+## Configuration
 
-Take a look at `README-TEMPLATE.md` for an example of what a Hardhat plugin's
-README should look like.
+This plugin extends the `HardhatUserConfig` object and adds an optional `liveFork` property.
 
-## Migrating from Buidler?
+This is an example of how to set it:
 
-Take a look at [the migration guide](MIGRATION.md)!
+```js
+module.exports = {
+  liveFork: {
+    enabled: true, // default is true, you can disable it by setting to false
+    txMatcher: (tx) => {
+      // custom logic to match txs to replay on your live fork
+      // e.g. only replay mainnet txs sent to a particular address
+      return tx.to === "0x1234";
+    },
+  },
+};
+```
