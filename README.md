@@ -57,7 +57,7 @@ export default config;
 
 ### Step 4: Run the node
 
-The following will start hardhat node along with replaying txs from mainnet (provided fork url).
+The following will start hardhat node along with replaying txs from mainnet (provided fork url). If you have any [hardhat-deploy](https://github.com/wighawag/hardhat-deploy) deploy scripts, it will also run them (so basically you can connect your frontend to it for alpha testing).
 
 ```
 npx hardhat node
