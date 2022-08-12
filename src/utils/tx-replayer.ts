@@ -12,7 +12,8 @@ export async function startTxReplayer(
   provider: HardhatNetworkProvider,
   remoteProvider: ethers.providers.Provider,
   syncedBlockNumber: number,
-  matcher?: TxMatcher
+  matcher: TxMatcher | undefined,
+  delay: number
 ) {
   const impersonatedAddresses = new Map<string, boolean>();
 
@@ -49,7 +50,7 @@ export async function startTxReplayer(
     }
 
     // cool down for a bit
-    await new Promise((resolve) => setTimeout(resolve, 20000));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   async function replayBlocks(blocks: BlockWithTransactions[]) {

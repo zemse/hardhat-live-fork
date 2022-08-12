@@ -60,7 +60,8 @@ subtask(TASK_NODE_SERVER_CREATED).setAction(
       hardhatNetworkProvider,
       remoteProvider,
       latestBlock,
-      config.liveFork.txMatcher
+      config.liveFork.txMatcher,
+      config.liveFork.delay
     ).catch(console.error);
   }
 );

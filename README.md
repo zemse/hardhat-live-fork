@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
     hardhat: {
       forking: {
         enabled: true,
-        // provide fork url here
+        // provide an archive node url
         url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
       },
     },
@@ -78,6 +78,7 @@ module.exports = {
       // e.g. only replay mainnet txs sent to a particular address
       return tx.to === "0x1234";
     },
+    delay: 5000, // delay after iterations, default 20000ms
   },
 };
 ```

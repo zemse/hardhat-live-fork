@@ -6,6 +6,7 @@ extendConfig(
     config.liveFork = {
       enabled: userConfig.liveFork?.enabled ?? true,
       txMatcher: userConfig.liveFork?.txMatcher,
+      delay: userConfig.liveFork?.delay ?? 20000,
     };
   }
 );

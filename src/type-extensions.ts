@@ -14,13 +14,15 @@ declare module "hardhat/types/config" {
     liveFork: {
       enabled?: boolean;
       txMatcher?: TxMatcher;
+      delay?: number;
     };
   }
 
   export interface HardhatConfig {
     liveFork: {
-      enabled?: boolean;
+      enabled: boolean;
       txMatcher?: TxMatcher;
+      delay: number;
     };
   }
 }
