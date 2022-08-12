@@ -19,7 +19,8 @@ subtask(TASK_NODE_SERVER_CREATED).setAction(
       provider: EthereumProvider;
       server: JsonRpcServer;
     },
-    { config }
+    { config },
+    runSuper
   ) => {
     if (!config.liveFork.enabled) return;
 
@@ -63,5 +64,8 @@ subtask(TASK_NODE_SERVER_CREATED).setAction(
       config.liveFork.txMatcher,
       config.liveFork.delay
     ).catch(console.error);
+
+    // In case there are other plugins
+    runSuper();
   }
 );
