@@ -22,7 +22,7 @@ export async function startTxReplayer(
 
     if (target !== syncedBlockNumber) {
       let blocks: BlockWithTransactions[] = [];
-      if (target === syncedBlockNumber + 1) {
+      if (target !== syncedBlockNumber + 1) {
         // make a batch query to fetch all the unreplayed blocks so far
         logger(
           `Receiving ${target - syncedBlockNumber} blocks: from ${
