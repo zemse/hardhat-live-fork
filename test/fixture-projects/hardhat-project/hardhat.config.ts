@@ -6,8 +6,17 @@ import "../../../src/index";
 const config: HardhatUserConfig = {
   solidity: "0.7.3",
   defaultNetwork: "hardhat",
-  paths: {
-    newPath: "asd",
+  networks: {
+    hardhat: {
+      forking: {
+        enabled: true,
+        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+        blockNumber: 12327028,
+      },
+    },
+  },
+  txMatcher: (tx) => {
+    return !!tx.to?.startsWith("0x1");
   },
 };
 
