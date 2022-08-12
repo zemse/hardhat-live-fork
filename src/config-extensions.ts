@@ -3,6 +3,9 @@ import { HardhatConfig, HardhatUserConfig } from "hardhat/types";
 
 extendConfig(
   (config: HardhatConfig, userConfig: Readonly<HardhatUserConfig>) => {
-    config.txMatcher = userConfig.txMatcher;
+    config.liveFork = {
+      enabled: userConfig.liveFork?.enabled ?? true,
+      txMatcher: userConfig.liveFork?.txMatcher,
+    };
   }
 );

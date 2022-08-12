@@ -11,12 +11,13 @@ const config: HardhatUserConfig = {
       forking: {
         enabled: true,
         url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
-        blockNumber: 12327028,
       },
     },
   },
-  txMatcher: (tx) => {
-    return !!tx.to?.startsWith("0x1");
+  liveFork: {
+    txMatcher: (tx) => {
+      return !!tx.to?.startsWith("0x1");
+    },
   },
 };
 

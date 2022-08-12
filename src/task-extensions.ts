@@ -21,6 +21,8 @@ subtask(TASK_NODE_SERVER_CREATED).setAction(
     },
     { config }
   ) => {
+    if (!config.liveFork.enabled) return;
+
     // Unwrap the low level provider
     const hardhatNetworkProvider = await getHardhatNetworkProvider(provider);
 
@@ -58,7 +60,7 @@ subtask(TASK_NODE_SERVER_CREATED).setAction(
       hardhatNetworkProvider,
       remoteProvider,
       latestBlock,
-      config.txMatcher
+      config.liveFork.txMatcher
     ).catch(console.error);
   }
 );

@@ -11,10 +11,16 @@ declare module "hardhat/types/config" {
   // This is an example of an extension to one of the Hardhat config values.
 
   export interface HardhatUserConfig {
-    txMatcher?: TxMatcher;
+    liveFork: {
+      enabled?: boolean;
+      txMatcher?: TxMatcher;
+    };
   }
 
   export interface HardhatConfig {
-    txMatcher?: TxMatcher;
+    liveFork: {
+      enabled?: boolean;
+      txMatcher?: TxMatcher;
+    };
   }
 }
