@@ -37,7 +37,7 @@ export const getHardhatNetworkProvider = async (
     currentLoopIterations += 1;
     if (currentLoopIterations > maxLoopIterations) {
       throw new Error(
-        `[smock]: unable to find base hardhat provider. are you sure you're running locally?`
+        `LiveFork: unable to find base hardhat provider. are you sure you're running locally?`
       );
     }
   }
