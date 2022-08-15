@@ -21,40 +21,53 @@ export async function startTxReplayer(
 
   const impersonatedAddresses = new Map<string, boolean>();
   let syncedBlockNumber: number = fork.block;
+
   while (1) {
-    // get latest block number
-    const target = await remoteProvider.getBlockNumber();
-
-    if (target !== syncedBlockNumber) {
-      let blocks: BlockWithTransactions[] = [];
-      if (target !== syncedBlockNumber + 1) {
-        // make a batch query to fetch all the unreplayed blocks so far
-        logger(
-          `Receiving ${target - syncedBlockNumber} blocks: from ${
-            syncedBlockNumber + 1
-          } to ${target}`
-        );
-        blocks = await Promise.all(
-          new Array(target - syncedBlockNumber).fill(null).map((_, i) => {
-            const number: number = syncedBlockNumber + 1 + i;
-            return remoteProvider.getBlockWithTransactions(number);
-          })
-        );
-      } else {
-        // fetch the one replayed block
-        logger(`Receiving 1 block: ${target}`);
-        blocks = [await remoteProvider.getBlockWithTransactions(target)];
-      }
-
-      // replay matched successful txs from each block
-      await replayBlocks(blocks);
-
-      // start after target
-      syncedBlockNumber = target;
-    }
+    await replayUptoLatest();
 
     // cool down for a bit
     await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  async function replayUptoLatest() {
+    // get latest block number
+    const target = await remoteProvider.getBlockNumber();
+    let batchTarget: number;
+    do {
+      // only fetch 50 blocks at a time
+      // TODO make it by chain id
+      batchTarget = Math.min(target, syncedBlockNumber + 50);
+
+      if (batchTarget !== syncedBlockNumber) {
+        let blocks: BlockWithTransactions[] = [];
+        if (batchTarget !== syncedBlockNumber + 1) {
+          // make a batch query to fetch all the unreplayed blocks so far
+          logger(
+            `Receiving ${batchTarget - syncedBlockNumber} blocks: from ${
+              syncedBlockNumber + 1
+            } to ${batchTarget} (latest: ${target})`
+          );
+          blocks = await Promise.all(
+            new Array(batchTarget - syncedBlockNumber)
+              .fill(null)
+              .map((_, i) => {
+                const number: number = syncedBlockNumber + 1 + i;
+                return remoteProvider.getBlockWithTransactions(number);
+              })
+          );
+        } else {
+          // fetch the one replayed block
+          logger(`Receiving 1 block: ${batchTarget}`);
+          blocks = [await remoteProvider.getBlockWithTransactions(batchTarget)];
+        }
+
+        // replay matched successful txs from each block
+        await replayBlocks(blocks);
+
+        // start after target
+        syncedBlockNumber = batchTarget;
+      }
+    } while (batchTarget !== target);
   }
 
   async function replayBlocks(blocks: BlockWithTransactions[]) {

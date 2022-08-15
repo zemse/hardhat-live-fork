@@ -25,7 +25,13 @@ subtask(TASK_NODE_GET_PROVIDER).setAction(async (args, hre, runSuper) => {
 
   // Update fork if needed
   const remoteProvider = new ethers.providers.JsonRpcBatchProvider(fork.url);
-  const latestBlock = await remoteProvider.getBlockNumber();
+
+  let latestBlock = await remoteProvider.getBlockNumber();
+
+  // to avoid using different fork block number always, we can use a nearest checkpoint block
+  // and sync from there. so that cache is present.
+  latestBlock = Math.max(latestBlock - (latestBlock % 5000), fork.block);
+
   if (latestBlock - fork.block > 500) {
     // If user specified some fork block number, its not practical to replay
     // all the txs so far since it'd involve a lot of rpc requests.
