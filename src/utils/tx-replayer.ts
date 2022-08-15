@@ -1,22 +1,26 @@
 import { ethers } from "ethers";
-import { HardhatNetworkProvider } from "hardhat/internal/hardhat-network/provider/provider";
+import { EthereumProvider } from "hardhat/types";
 
 import { BlockWithTransactions } from "@ethersproject/abstract-provider";
 
 import { fundBalance, impersonateAccount, sendTx } from "./hardhat-helpers";
+import { getHardhatNetworkProvider } from "./hardhat-network-provider";
 import { logger } from "./logger";
+import { retrieveForkUrlAndBlock } from "./retrive-fork-url-and-block";
 
 export type TxMatcher = (tx: ethers.providers.TransactionResponse) => boolean;
 
 export async function startTxReplayer(
-  provider: HardhatNetworkProvider,
-  remoteProvider: ethers.providers.Provider,
-  syncedBlockNumber: number,
+  wrappedProvider: EthereumProvider,
   matcher: TxMatcher | undefined,
   delay: number
 ) {
-  const impersonatedAddresses = new Map<string, boolean>();
+  const provider = await getHardhatNetworkProvider(wrappedProvider);
+  const fork = await retrieveForkUrlAndBlock(provider);
+  const remoteProvider = new ethers.providers.JsonRpcBatchProvider(fork.url);
 
+  const impersonatedAddresses = new Map<string, boolean>();
+  let syncedBlockNumber: number = fork.block;
   while (1) {
     // get latest block number
     const target = await remoteProvider.getBlockNumber();
