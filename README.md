@@ -79,6 +79,7 @@ module.exports = {
       return tx.to === "0x1234";
     },
     delay: 5000, // delay after iterations, default 20000ms
+    forkBlockNumber: 'auto',
   },
 };
 ```
