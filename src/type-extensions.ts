@@ -15,6 +15,7 @@ declare module "hardhat/types/config" {
       enabled?: boolean;
       txMatcher?: TxMatcher;
       delay?: number;
+      forkBlockNumber?: number | "latest" | "auto";
     };
   }
 
@@ -23,6 +24,7 @@ declare module "hardhat/types/config" {
       enabled: boolean;
       txMatcher?: TxMatcher;
       delay: number;
+      forkBlockNumber: number | "latest" | "auto";
     };
   }
 }

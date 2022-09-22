@@ -26,20 +26,33 @@ subtask(TASK_NODE_GET_PROVIDER).setAction(async (args, hre, runSuper) => {
   // Update fork if needed
   const remoteProvider = new ethers.providers.JsonRpcBatchProvider(fork.url);
 
-  let latestBlock = await remoteProvider.getBlockNumber();
+  let liveForkBlockNumber: number;
+  switch (hre.config.liveFork.forkBlockNumber) {
+    case "latest":
+      liveForkBlockNumber = await remoteProvider.getBlockNumber();
+      break;
+    case "auto":
+      // to avoid using different fork block number always, we can use a nearest checkpoint block
+      // and sync from there. so that cache is present.
+      liveForkBlockNumber = await remoteProvider.getBlockNumber();
+      liveForkBlockNumber = Math.max(
+        liveForkBlockNumber - (liveForkBlockNumber % 5000),
+        fork.block
+      );
+      break;
+    default:
+      liveForkBlockNumber = hre.config.liveFork.forkBlockNumber;
+      break;
+  }
 
-  // to avoid using different fork block number always, we can use a nearest checkpoint block
-  // and sync from there. so that cache is present.
-  latestBlock = Math.max(latestBlock - (latestBlock % 5000), fork.block);
-
-  if (latestBlock - fork.block > 500) {
+  if (liveForkBlockNumber - fork.block > 500) {
     // If user specified some fork block number, its not practical to replay
     // all the txs so far since it'd involve a lot of rpc requests.
     // Hence, the intended way to use live fork is to fork from a recent block.
 
     // Forking from the current block number
     logger(
-      `Configured fork block is ${fork.block}. Changing it to ${latestBlock}.`
+      `Configured fork block is ${fork.block}. Changing it to ${liveForkBlockNumber}.`
     );
 
     await hardhatNetworkProvider.request({
@@ -48,7 +61,7 @@ subtask(TASK_NODE_GET_PROVIDER).setAction(async (args, hre, runSuper) => {
         {
           forking: {
             jsonRpcUrl: fork.url,
-            blockNumber: latestBlock,
+            blockNumber: liveForkBlockNumber,
           },
         },
       ],
