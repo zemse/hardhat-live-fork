@@ -45,9 +45,9 @@ const config: HardhatUserConfig = {
   },
   liveFork: {
     txMatcher: (tx) => {
-      // custom logic to match which txs to replay on LiveFork
-      // e.g. only replay mainnet txs sent to this address
-      return tx.to === "0x1234";
+      // only replay txs to chainlink eth usd aggregator
+      // so that the price feeds update on the mainnet fork
+      return tx.to === "0x3607e46698d218B3a5Cae44bF381475C0a5e2ca7";
     },
   },
 };
@@ -73,13 +73,13 @@ This is an example of how to set it:
 module.exports = {
   liveFork: {
     enabled: true, // default is true, you can disable it by setting to false
-    txMatcher: (tx) => {
+    txMatcher: (tx: TransactionResponse) => {
       // custom logic to match txs to replay on your live fork
       // e.g. only replay mainnet txs sent to a particular address
       return tx.to === "0x1234";
     },
-    delay: 5000, // delay after iterations, default 20000ms
-    forkBlockNumber: 'auto',
+    delay: 20000, // delay to fetch new blocks, works best if around chain block time
+    forkBlockNumber: "auto", // 'latest', number
   },
 };
 ```
